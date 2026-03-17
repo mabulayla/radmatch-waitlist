@@ -6,24 +6,25 @@
 <title>RadMatch — The Break Room Is Empty.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════
+     SUPABASE SDK
+     ═══════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
   :root {
-    --emerald: #059669;
+    --emerald:       #059669;
     --emerald-light: #10b981;
-    --emerald-dim: rgba(5, 150, 105, 0.15);
-    --navy: #0b0e1a;
-    --navy-mid: #10122a;
-    --purple-deep: #13103a;
-    --glass-bg: rgba(16, 14, 42, 0.65);
-    --glass-border: rgba(140, 100, 255, 0.18);
-    --glass-border-emerald: rgba(5, 150, 105, 0.22);
-    --text-primary: #eeeaf8;
-    --text-muted: #8a80ab;
-    --text-dim: #4e4670;
+    --emerald-dim:   rgba(5, 150, 105, 0.15);
+    --glass-bg:      rgba(16, 14, 42, 0.65);
+    --glass-border:  rgba(140, 100, 255, 0.18);
+    --text-primary:  #eeeaf8;
+    --text-muted:    #8a80ab;
+    --text-dim:      #4e4670;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -36,115 +37,69 @@
   }
 
   /* ── BACKGROUND GLOW ── */
-  .bg-glow {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
+  .bg-glow { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
   .bg-glow::before {
     content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 1000px;
-    height: 1000px;
+    width: 1000px; height: 1000px;
     background: radial-gradient(ellipse at center,
-      rgba(108, 60, 255, 0.18) 0%,
-      rgba(80, 40, 200, 0.07) 40%,
-      transparent 70%);
+      rgba(108, 60, 255, 0.18) 0%, rgba(80, 40, 200, 0.07) 40%, transparent 70%);
     animation: pulseGlow 5s ease-in-out infinite;
   }
-
   .bg-glow::after {
     content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -55%);
-    width: 450px;
-    height: 450px;
-    background: radial-gradient(ellipse at center,
-      rgba(5, 150, 105, 0.1) 0%,
-      transparent 70%);
+    width: 450px; height: 450px;
+    background: radial-gradient(ellipse at center, rgba(5, 150, 105, 0.1) 0%, transparent 70%);
     animation: pulseGlow 5s ease-in-out infinite reverse;
   }
-
   @keyframes pulseGlow {
     0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.08); }
+    50%       { opacity: 0.6; transform: translate(-50%, -50%) scale(1.08); }
   }
 
-  /* Subtle scanline overlay */
   .scanlines {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
-    );
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(0deg,
+      transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
   }
 
   /* ── LAYOUT ── */
   .page {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    position: relative; z-index: 2; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
     padding: 48px 20px 80px;
   }
 
-  /* ── TOP NAV ── */
+  /* ── NAV ── */
   nav {
-    width: 100%;
-    max-width: 900px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 64px;
+    width: 100%; max-width: 900px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 48px;
     animation: fadeDown 0.8s ease both;
   }
-
-  .logo {
+  .nav-wordmark {
     font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    color: #c4b5fd;
-    text-transform: uppercase;
+    font-size: 0.8rem; font-weight: 500; letter-spacing: 0.2em;
+    color: #c4b5fd; text-transform: uppercase;
   }
-
   .nav-badge {
     font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: var(--text-muted);
+    font-size: 0.7rem; letter-spacing: 0.12em; color: var(--text-muted);
     border: 1px solid rgba(140, 100, 255, 0.22);
-    padding: 5px 12px;
-    border-radius: 2px;
+    padding: 5px 12px; border-radius: 2px;
     background: rgba(140, 100, 255, 0.06);
   }
 
   /* ── GLASS CARD ── */
   .glass-card {
-    width: 100%;
-    max-width: 780px;
+    width: 100%; max-width: 780px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 6px;
-    padding: 64px 72px;
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    border-radius: 6px; padding: 56px 72px;
+    backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
     position: relative;
     box-shadow:
       0 0 0 1px rgba(140, 100, 255, 0.08),
@@ -154,422 +109,236 @@
       inset 0 -1px 0 rgba(5, 150, 105, 0.06);
     animation: fadeUp 0.9s 0.2s ease both;
   }
-
-  /* glint top edge — purple-to-emerald shimmer */
   .glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 8%; right: 8%;
-    height: 1px;
+    content: ''; position: absolute;
+    top: 0; left: 8%; right: 8%; height: 1px;
     background: linear-gradient(90deg,
-      transparent,
-      rgba(140, 100, 255, 0.4) 20%,
-      rgba(16, 185, 129, 0.7) 50%,
-      rgba(140, 100, 255, 0.4) 80%,
-      transparent);
+      transparent, rgba(140, 100, 255, 0.4) 20%,
+      rgba(16, 185, 129, 0.7) 50%, rgba(140, 100, 255, 0.4) 80%, transparent);
     border-radius: 50%;
   }
 
-  /* ── HERO TEXT ── */
-
-  /* ── LOGO PLACEHOLDER ── */
-  .app-logo-wrap {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 36px;
-  }
-
+  /* ── LOGO ── */
+  .app-logo-wrap { display: flex; justify-content: flex-start; margin-bottom: 32px; }
   .app-logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
-    object-fit: cover;
-    display: block;
-    box-shadow: 0 0 0 1px rgba(140, 100, 255, 0.25), 0 8px 32px rgba(5, 3, 20, 0.5);
+    width: 110px; height: 110px;
+    border-radius: 24px;
+    object-fit: contain; object-position: center;
+    display: block; background: transparent;
+    box-shadow:
+      0 0 0 1px rgba(140, 100, 255, 0.2),
+      0 12px 40px rgba(5, 3, 20, 0.55),
+      0 0 28px rgba(108, 60, 255, 0.15);
   }
-
   .app-logo-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
+    width: 110px; height: 110px; border-radius: 24px;
     background: linear-gradient(135deg, #7c6bdb 0%, #a78cfa 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 1.4;
+    display: none; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.5); text-transform: uppercase; text-align: center; line-height: 1.4;
     box-shadow: 0 0 0 1px rgba(140, 100, 255, 0.3), 0 8px 32px rgba(5, 3, 20, 0.5);
-    flex-shrink: 0;
-  }
-  .app-logo-wrap {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 36px;
   }
 
-  .app-logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
-    object-fit: cover;
-    display: block;
-    /* Remove the box-shadow below once real logo is placed */
-    box-shadow: 0 0 0 1px rgba(140, 100, 255, 0.25), 0 8px 32px rgba(5, 3, 20, 0.5);
-  }
-
-  /* Shown only when src is missing / as fallback */
-  .app-logo-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #7c6bdb 0%, #a78cfa 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 1.4;
-    box-shadow: 0 0 0 1px rgba(140, 100, 255, 0.3), 0 8px 32px rgba(5, 3, 20, 0.5);
-    flex-shrink: 0;
-  }
+  /* ── HERO ── */
   .hero-eyebrow {
     font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    color: var(--emerald);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 0.68rem; font-weight: 400; letter-spacing: 0.25em;
+    color: var(--emerald); text-transform: uppercase;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
   }
-
   .hero-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 1px;
-    background: var(--emerald);
+    content: ''; display: inline-block; width: 20px; height: 1px; background: var(--emerald);
   }
-
   h1 {
     font-family: 'DM Serif Display', serif;
     font-size: clamp(2.6rem, 6vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    color: var(--text-primary);
-    margin-bottom: 24px;
+    line-height: 1.05; letter-spacing: -0.01em;
+    color: var(--text-primary); margin-bottom: 20px;
   }
-
-  h1 em {
-    font-style: italic;
-    color: var(--emerald-light);
-  }
-
+  h1 em { font-style: italic; color: var(--emerald-light); }
   .subhero {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: rgba(232, 237, 233, 0.75);
-    max-width: 580px;
-    margin-bottom: 48px;
-    font-weight: 400;
+    font-size: 1.05rem; line-height: 1.7;
+    color: rgba(232, 237, 233, 0.75); max-width: 580px; margin-bottom: 44px;
   }
+  .subhero strong { color: var(--text-primary); font-weight: 600; }
 
-  .subhero strong {
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  /* ── DIVIDER ── */
   .divider {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(140, 100, 255, 0.2) 30%, rgba(5, 150, 105, 0.2) 70%, transparent);
-    margin: 44px 0;
+    width: 100%; height: 1px; margin: 40px 0;
+    background: linear-gradient(90deg,
+      transparent, rgba(140, 100, 255, 0.2) 30%, rgba(5, 150, 105, 0.2) 70%, transparent);
   }
 
   /* ── HUBS ── */
   .section-label {
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 16px;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--text-dim); text-transform: uppercase; margin-bottom: 14px;
   }
-
-  .hubs {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 44px;
-  }
-
+  .hubs { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
   .hub-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(140, 100, 255, 0.2);
-    border-radius: 2px;
-    padding: 8px 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    color: var(--text-primary);
-    position: relative;
-    overflow: hidden;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(140, 100, 255, 0.2); border-radius: 2px; padding: 8px 16px;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em;
+    color: var(--text-primary); position: relative; overflow: hidden;
     transition: border-color 0.2s, color 0.2s;
   }
-
   .hub-pill::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--emerald-dim);
-    opacity: 0;
-    transition: opacity 0.2s;
+    content: ''; position: absolute; inset: 0;
+    background: var(--emerald-dim); opacity: 0; transition: opacity 0.2s;
   }
-
   .hub-pill:hover { border-color: var(--emerald); color: var(--emerald-light); }
   .hub-pill:hover::before { opacity: 1; }
-
   .hub-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--emerald);
-    box-shadow: 0 0 6px var(--emerald);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--emerald); box-shadow: 0 0 6px var(--emerald);
     animation: blink 2s ease-in-out infinite;
   }
-
-  .hub-pill:nth-child(2) .hub-dot { animation-delay: 0.4s; }
-  .hub-pill:nth-child(3) .hub-dot { animation-delay: 0.8s; }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  .hub-pill:nth-child(2) .hub-dot { animation-delay: 0.5s; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   /* ── MODES ── */
-  .modes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 44px;
-  }
-
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 40px; }
   .mode-card {
-    border: 1px solid rgba(140, 100, 255, 0.13);
-    border-radius: 4px;
-    padding: 20px 18px;
-    background: rgba(80, 50, 160, 0.08);
-    transition: border-color 0.2s, background 0.2s;
+    border: 1px solid rgba(140, 100, 255, 0.13); border-radius: 4px; padding: 20px 18px;
+    background: rgba(80, 50, 160, 0.08); transition: border-color 0.2s, background 0.2s;
   }
-
-  .mode-card:hover {
-    border-color: rgba(5, 150, 105, 0.3);
-    background: rgba(5, 150, 105, 0.07);
-  }
-
-  .mode-icon {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    display: block;
-  }
-
+  .mode-card:hover { border-color: rgba(5, 150, 105, 0.3); background: rgba(5, 150, 105, 0.07); }
+  .mode-icon { font-size: 1.2rem; margin-bottom: 10px; display: block; }
   .mode-title {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    color: var(--emerald-light);
-    text-transform: uppercase;
-    margin-bottom: 6px;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em;
+    color: var(--emerald-light); text-transform: uppercase; margin-bottom: 6px;
   }
+  .mode-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
 
-  .mode-desc {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.55;
-  }
-
-  /* ── VERIFICATION BANNER ── */
+  /* ── VERIFY BANNER ── */
   .verify-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 16px 20px;
-    border: 1px solid rgba(5, 150, 105, 0.2);
-    border-left: 3px solid var(--emerald);
-    border-radius: 3px;
-    background: rgba(5, 150, 105, 0.06);
-    margin-bottom: 44px;
+    display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px;
+    border: 1px solid rgba(5, 150, 105, 0.2); border-left: 3px solid var(--emerald);
+    border-radius: 3px; background: rgba(5, 150, 105, 0.06); margin-bottom: 40px;
   }
-
-  .verify-icon {
-    font-size: 1rem;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
-
-  .verify-text {
-    font-size: 0.83rem;
-    color: rgba(232, 237, 233, 0.7);
-    line-height: 1.6;
-  }
-
-  .verify-text strong {
-    color: var(--emerald-light);
-    font-weight: 600;
-  }
+  .verify-icon { font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
+  .verify-text { font-size: 0.83rem; color: rgba(232, 237, 233, 0.7); line-height: 1.6; }
+  .verify-text strong { color: var(--emerald-light); font-weight: 600; }
 
   /* ── FORM ── */
   .form-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-bottom: 14px;
-    display: block;
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; display: block;
   }
 
-  .form-row {
-    display: flex;
-    gap: 10px;
+  /* Hub toggle buttons */
+  .hub-selector { display: flex; gap: 10px; margin-bottom: 6px; }
+  .hub-toggle {
+    flex: 1; padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(140, 100, 255, 0.2); border-radius: 3px;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em;
+    color: var(--text-muted); cursor: pointer; text-align: center;
+    transition: all 0.18s ease;
   }
+  .hub-toggle:hover {
+    border-color: rgba(5, 150, 105, 0.4);
+    color: var(--text-primary); background: rgba(5, 150, 105, 0.05);
+  }
+  .hub-toggle.selected {
+    border-color: var(--emerald); color: var(--emerald-light);
+    background: rgba(5, 150, 105, 0.1);
+    box-shadow: 0 0 0 1px rgba(5, 150, 105, 0.2), 0 0 16px rgba(5, 150, 105, 0.1);
+  }
+  .hub-toggle.selected::before { content: '✓  '; font-size: 0.65rem; }
 
+  .field-error {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em;
+    color: #f87171; margin-bottom: 12px; display: none; margin-top: 6px;
+  }
+  .field-error.show { display: block; }
+
+  .form-row { display: flex; gap: 10px; margin-top: 14px; }
   .form-input {
-    flex: 1;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(5, 150, 105, 0.2);
-    border-radius: 3px;
-    padding: 14px 18px;
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(5, 150, 105, 0.2); border-radius: 3px; padding: 14px 18px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 0.9rem; color: var(--text-primary);
+    outline: none; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   }
-
   .form-input::placeholder { color: var(--text-dim); }
-
   .form-input:focus {
-    border-color: var(--emerald);
-    background: rgba(5, 150, 105, 0.05);
+    border-color: var(--emerald); background: rgba(5, 150, 105, 0.05);
     box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
   }
+  .form-input.error { border-color: #f87171; }
 
   .btn-waitlist {
-    background: var(--emerald);
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    padding: 14px 28px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    position: relative;
-    overflow: hidden;
+    background: var(--emerald); color: #fff; border: none; border-radius: 3px;
+    padding: 14px 28px; font-family: 'DM Mono', monospace; font-size: 0.78rem;
+    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap; position: relative; overflow: hidden;
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
   }
-
   .btn-waitlist::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
     pointer-events: none;
   }
-
   .btn-waitlist:hover {
-    background: var(--emerald-light);
-    box-shadow: 0 0 24px rgba(5, 150, 105, 0.4);
+    background: var(--emerald-light); box-shadow: 0 0 24px rgba(5, 150, 105, 0.4);
     transform: translateY(-1px);
   }
-
   .btn-waitlist:active { transform: translateY(0); }
-
-  .btn-waitlist.loading { opacity: 0.7; pointer-events: none; }
+  .btn-waitlist:disabled { opacity: 0.65; pointer-events: none; }
 
   .form-note {
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    margin-top: 12px;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.05em;
+    font-size: 0.72rem; color: var(--text-dim); margin-top: 12px;
+    font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
   }
 
-  /* ── SUCCESS STATE ── */
-  .success-msg {
-    display: none;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border: 1px solid rgba(5, 150, 105, 0.3);
-    border-radius: 3px;
-    background: rgba(5, 150, 105, 0.1);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.82rem;
-    color: var(--emerald-light);
-    letter-spacing: 0.05em;
+  /* ── SUCCESS ── */
+  .success-block {
+    display: none; flex-direction: column; align-items: center;
+    text-align: center; padding: 36px 20px; gap: 16px;
   }
-
-  .success-msg.show { display: flex; }
+  .success-block.show { display: flex; animation: fadeUp 0.5s ease both; }
+  .success-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(5, 150, 105, 0.15);
+    border: 1px solid rgba(5, 150, 105, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; box-shadow: 0 0 28px rgba(5, 150, 105, 0.25);
+  }
+  .success-title {
+    font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--text-primary);
+  }
+  .success-sub {
+    font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; max-width: 380px;
+  }
+  .success-hub-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em;
+    color: var(--emerald-light); border: 1px solid rgba(5, 150, 105, 0.3);
+    padding: 6px 16px; border-radius: 2px; background: rgba(5, 150, 105, 0.08);
+  }
 
   /* ── FOOTER ── */
   footer {
-    margin-top: 48px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    text-align: center;
+    margin-top: 48px; font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.12em; color: var(--text-dim); text-align: center;
     animation: fadeUp 1s 0.5s ease both;
   }
-
   footer a { color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
   footer a:hover { color: var(--emerald); }
 
   /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 680px) {
     .glass-card { padding: 40px 28px; }
-
     .modes { grid-template-columns: 1fr; gap: 10px; }
-
+    .hub-selector { flex-direction: column; }
     .form-row { flex-direction: column; }
-
     .btn-waitlist { width: 100%; text-align: center; }
-
     h1 { font-size: 2.2rem; }
   }
-
-  @media (max-width: 400px) {
-    .hubs { flex-direction: column; }
-  }
+  @media (max-width: 400px) { .hubs { flex-direction: column; } }
 </style>
 </head>
 <body>
@@ -580,15 +349,13 @@
 <div class="page">
 
   <nav>
-    <span class="logo">RadMatch</span>
+    <span class="nav-wordmark">RadMatch</span>
     <span class="nav-badge">PRE-LAUNCH ACCESS</span>
   </nav>
 
   <div class="glass-card">
 
-    <!-- ╔══════════════════════════════════════════════╗ -->
-    <!-- ║  LOGO — replace src with your actual logo   ║ -->
-    <!-- ╚══════════════════════════════════════════════╝ -->
+    <!-- LOGO -->
     <div class="app-logo-wrap">
       <img
         src="./RadMatchLogo.png"
@@ -596,24 +363,23 @@
         class="app-logo"
         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
       />
-      <div class="app-logo-placeholder" style="display:none;">Logo<br>Here</div>
+      <div class="app-logo-placeholder">Logo<br>Here</div>
     </div>
 
+    <!-- HERO -->
     <p class="hero-eyebrow">Expanding Soon</p>
-
     <h1>THE BREAK ROOM<br>IS <em>EMPTY.</em></h1>
-
     <p class="subhero">
-      Let's fix that. Join the exclusive waitlist for <strong>RadMatch</strong>—the first dating, networking, and community platform built <strong>strictly for verified Radiology professionals.</strong>
+      Let's fix that. Join the exclusive waitlist for <strong>RadMatch</strong>—the first dating,
+      networking, and community platform built <strong>strictly for verified Radiology professionals.</strong>
     </p>
 
     <div class="divider"></div>
 
-    <!-- HUBS -->
+    <!-- HUBS — Toledo removed (stealth mode) -->
     <p class="section-label">Priority Expansion Hubs</p>
     <div class="hubs">
       <div class="hub-pill"><span class="hub-dot"></span>Columbus, OH</div>
-      <div class="hub-pill"><span class="hub-dot"></span>Toledo, OH</div>
       <div class="hub-pill"><span class="hub-dot"></span>Detroit, MI</div>
     </div>
 
@@ -641,98 +407,144 @@
     <div class="verify-banner">
       <span class="verify-icon">✅</span>
       <p class="verify-text">
-        <strong>A Trusted Professional Network.</strong> Connect with verified Imaging Professionals and fellow students. While everyone is welcome, the <strong>Emerald Badge</strong> is reserved strictly for those who authenticate their <strong>ARRT, ARDMS, or NMTCB</strong> credentials.
+        <strong>A Trusted Professional Network.</strong> Connect with verified Imaging Professionals
+        and fellow students. While everyone is welcome, the <strong>Emerald Badge</strong> is reserved
+        strictly for those who authenticate their <strong>ARRT, ARDMS, or NMTCB</strong> credentials.
       </p>
     </div>
 
-    <!-- FORM -->
-    <label class="form-label" for="email-input">Secure your spot</label>
-    <div class="form-row">
-      <input
-        type="email"
-        id="email-input"
-        class="form-input"
-        placeholder="your.email@hospital.com"
-        autocomplete="email"
-        required
-      />
-      <button class="btn-waitlist" id="submit-btn" onclick="handleSubmit()">
-        Join Waitlist
-      </button>
-    </div>
-    <p class="form-note">// No spam. Early access guaranteed. Unsubscribe anytime.</p>
+    <!-- ══════════════ FORM ══════════════ -->
+    <div id="form-block">
 
-    <div class="success-msg" id="success-msg">
-      <span>✓</span>
-      <span>You're on the list. We'll reach out when your hub goes live.</span>
+      <label class="form-label">Choose your hub</label>
+      <div class="hub-selector">
+        <button type="button" class="hub-toggle" id="hub-columbus" onclick="selectHub('Columbus, OH')">
+          Columbus, OH
+        </button>
+        <button type="button" class="hub-toggle" id="hub-detroit" onclick="selectHub('Detroit, MI')">
+          Detroit, MI
+        </button>
+      </div>
+      <p class="field-error" id="hub-error">// Please select a hub to continue.</p>
+
+      <label class="form-label" for="email-input">Your email</label>
+      <div class="form-row">
+        <input
+          type="email"
+          id="email-input"
+          class="form-input"
+          placeholder="your.email@hospital.com"
+          autocomplete="email"
+          required
+        />
+        <button class="btn-waitlist" id="submit-btn" onclick="handleSubmit()">
+          Join Waitlist
+        </button>
+      </div>
+      <p class="form-note" id="form-note">// No spam. Early access guaranteed. Unsubscribe anytime.</p>
+
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-block" id="success-block">
+      <div class="success-icon">✓</div>
+      <p class="success-title">You're on the list!</p>
+      <p class="success-sub">We'll reach out the moment RadMatch goes live in your city. Welcome to the network.</p>
+      <span class="success-hub-tag" id="success-hub-tag"></span>
     </div>
 
   </div>
 
   <footer>
-    <p>© 2025 RadMatch · Built for Radiology Professionals · <a href="mailto:contact@radmatch.app">contact@radmatch.app</a></p>
+    <p>© 2026 RadMatch · Built for Radiology Professionals · <a href="/cdn-cgi/l/email-protection#caa9a5a4beaba9be8ab8abaea7abbea9a2e4abbaba"><span class="__cf_email__" data-cfemail="e4878b8a90858790a4968580898590878cca859494">[email&#160;protected]</span></a></p>
   </footer>
 
 </div>
 
-<script>
-  /**
-   * ─────────────────────────────────────────────
-   * RadMatch Waitlist Form Handler
-   * ─────────────────────────────────────────────
-   * Replace the TODO sections below with your
-   * chosen backend (Supabase, Mailchimp, etc.)
-   * ─────────────────────────────────────────────
-   */
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  /* ═══════════════════════════════════════════════════════════════
+     SUPABASE CONFIG
+     ───────────────────────────────────────────────────────────────
+     1. Go to supabase.com → your project → Settings → API
+     2. Copy "Project URL"  → paste over YOUR_SUPABASE_PROJECT_URL
+     3. Copy "anon public"  → paste over YOUR_SUPABASE_ANON_KEY
+     ═══════════════════════════════════════════════════════════════ */
+  const SUPABASE_URL  = 'YOUR_SUPABASE_PROJECT_URL';
+  const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  /* ─── Hub selection ─── */
+  let selectedHub = null;
+
+  function selectHub(hub) {
+    selectedHub = hub;
+    document.getElementById('hub-columbus').classList.toggle('selected', hub === 'Columbus, OH');
+    document.getElementById('hub-detroit').classList.toggle('selected',  hub === 'Detroit, MI');
+    document.getElementById('hub-error').classList.remove('show');
+  }
+
+  /* ─── Submit handler ─── */
   async function handleSubmit() {
     const emailInput = document.getElementById('email-input');
-    const btn = document.getElementById('submit-btn');
-    const successMsg = document.getElementById('success-msg');
-    const email = emailInput.value.trim();
+    const btn        = document.getElementById('submit-btn');
+    const note       = document.getElementById('form-note');
+    const email      = emailInput.value.trim();
+    let   valid      = true;
 
-    // Basic validation
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      emailInput.style.borderColor = '#dc2626';
-      emailInput.focus();
-      setTimeout(() => { emailInput.style.borderColor = ''; }, 2000);
-      return;
+    // Validate hub
+    if (!selectedHub) {
+      document.getElementById('hub-error').classList.add('show');
+      valid = false;
     }
 
-    btn.classList.add('loading');
-    btn.textContent = 'Submitting...';
+    // Validate email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailInput.classList.add('error');
+      emailInput.focus();
+      setTimeout(() => emailInput.classList.remove('error'), 2500);
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // Loading state
+    btn.disabled    = true;
+    btn.textContent = 'Joining...';
 
     try {
-      // ─────────────────────────────────────────
-      // TODO: Replace with your API endpoint
-      //
-      // OPTION A — Supabase:
-      // const { error } = await supabase
-      //   .from('waitlist')
-      //   .insert([{ email, created_at: new Date().toISOString() }]);
-      //
-      // OPTION B — Custom API:
-      // const res = await fetch('/api/waitlist', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email })
-      // });
-      //
-      // OPTION C — Mailchimp / ConvertKit / Loops
-      // Use their respective REST APIs here.
-      // ─────────────────────────────────────────
+      const { error } = await db
+        .from('leads')
+        .insert([{
+          email:          email,
+          hub_preference: selectedHub,
+          created_at:     new Date().toISOString()
+        }]);
 
-      // Simulated success for now (remove this in production)
-      await new Promise(r => setTimeout(r, 800));
+      if (error) throw error;
 
-      // Show success state
-      emailInput.parentElement.style.display = 'none';
-      document.querySelector('.form-label').style.display = 'none';
-      document.querySelector('.form-note').style.display = 'none';
-      successMsg.classList.add('show');
+      // Show success screen
+      document.getElementById('form-block').style.display = 'none';
+      document.getElementById('success-hub-tag').textContent = '📍 ' + selectedHub;
+      document.getElementById('success-block').classList.add('show');
 
     } catch (err) {
-      console.error('Waitlist submission error:', err);
-      btn.classList.remove('loading');
+      console.error('Supabase error:', err);
+      btn.disabled    = false;
       btn.textContent = 'Join Waitlist';
-      alert
+
+      // Duplicate email (Postgres unique constraint code)
+      if (err.code === '23505') {
+        emailInput.classList.add('error');
+        note.textContent  = '// That email is already on the list — you\'re good!';
+        note.style.color  = '#10b981';
+        setTimeout(() => {
+          note.textContent = '// No spam. Early access guaranteed. Unsubscribe anytime.';
+          note.style.color = '';
+          emailInput.classList.remove('error');
+        }, 4000);
+      } else {
+        note.textContent = '// Something went wrong. Please try again.';
+        note.style.color = '#f87171';
+        setTimeout(() => {
+          note.textContent = '// No spam. Early access guaranteed. Unsubscribe anytime.';
