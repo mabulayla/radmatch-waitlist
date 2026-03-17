@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   :root {
     --emerald:       #059669;
@@ -202,14 +203,33 @@
     flex:1; padding:12px 16px; background:rgba(255,255,255,0.03);
     border:1px solid rgba(140,100,255,0.2); border-radius:3px;
     font-family:'DM Mono',monospace; font-size:0.78rem; letter-spacing:0.08em;
-    color:var(--text-muted); cursor:pointer; text-align:center; transition:all 0.18s ease;
+    color:var(--text-muted); cursor:pointer; text-align:center;
+    transition: all 0.22s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .hub-toggle:hover { border-color:rgba(5,150,105,0.4); color:var(--text-primary); background:rgba(5,150,105,0.05); }
+  .hub-toggle:hover {
+    border-color:rgba(5,150,105,0.4); color:var(--text-primary); background:rgba(5,150,105,0.05);
+  }
   .hub-toggle.selected {
-    border-color:var(--emerald); color:var(--emerald-light); background:rgba(5,150,105,0.1);
-    box-shadow:0 0 0 1px rgba(5,150,105,0.2), 0 0 16px rgba(5,150,105,0.1);
+    border-color: var(--emerald);
+    color: var(--emerald-light);
+    background: rgba(5,150,105,0.12);
+    box-shadow: 0 0 0 1px rgba(5,150,105,0.25),
+                0 0 20px rgba(5,150,105,0.18),
+                inset 0 0 12px rgba(5,150,105,0.06);
   }
-  .hub-toggle.selected::before { content:'checkmark  '; font-size:0.65rem; }
+  /* The checkmark icon — hidden by default, shown when selected */
+  .hub-toggle .check-icon {
+    display: none;
+    color: var(--emerald);
+    font-size: 0.8rem;
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+  .hub-toggle.selected .check-icon { display: inline-block; }
+  @keyframes popIn {
+    from { transform: scale(0) rotate(-10deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+  }
 
   .field-error {
     font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.06em;
@@ -250,10 +270,18 @@
 
   /* SUCCESS */
   .success-block {
-    display:none; flex-direction:column; align-items:center;
-    text-align:center; padding:36px 20px; gap:16px;
+    display: none;
+    flex-direction: column; align-items: center;
+    text-align: center; padding: 36px 20px; gap: 16px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
-  .success-block.show { display:flex; animation:fadeUp 0.5s ease both; }
+  .success-block.show {
+    display: flex;
+  }
+  .success-block.visible {
+    opacity: 1;
+  }
   .success-icon {
     width:60px; height:60px; border-radius:50%;
     background:rgba(5,150,105,0.15); border:1px solid rgba(5,150,105,0.4);
@@ -368,8 +396,12 @@
     <div id="form-block">
       <label class="form-label">Choose your hub</label>
       <div class="hub-selector">
-        <button type="button" class="hub-toggle" id="hub-columbus" onclick="selectHub('Columbus, OH')">Columbus, OH</button>
-        <button type="button" class="hub-toggle" id="hub-detroit"  onclick="selectHub('Detroit, MI')">Detroit, MI</button>
+        <button type="button" class="hub-toggle" id="hub-columbus" onclick="selectHub('Columbus, OH')">
+          <i class="fa-solid fa-check check-icon"></i>Columbus, OH
+        </button>
+        <button type="button" class="hub-toggle" id="hub-detroit"  onclick="selectHub('Detroit, MI')">
+          <i class="fa-solid fa-check check-icon"></i>Detroit, MI
+        </button>
       </div>
       <p class="field-error" id="hub-error">// Please select a hub to continue.</p>
 
@@ -394,17 +426,17 @@
 
   <footer>
     <p>&#169; 2026 RadMatch &middot; Built for Radiology Professionals &middot;
-      <a href="mailto:contact@radmatch.app">contact@radmatch.app</a></p>
+      <a href="/cdn-cgi/l/email-protection#85e6eaebf1e4e6f1c5f7e4e1e8e4f1e6edabe4f5f5"><span class="__cf_email__" data-cfemail="781b17160c191b0c380a191c15190c1b1056190808">[email&#160;protected]</span></a></p>
   </footer>
 
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // =====================================================================
   //  SUPABASE CREDENTIALS — PASTE YOUR VALUES ON THE TWO LINES BELOW
   // =====================================================================
-  const SUPABASE_URL  = 'https://ssaatoucljdpybavbqiw.supabase.co';   // e.g. https://abcxyz.supabase.co
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzYWF0b3VjbGpkcHliYXZicWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MDg0NjQsImV4cCI6MjA4NzQ4NDQ2NH0.4va_jztqxGljHBQfq0PuVA0nyyBAD-BX2f1E8FBGcQg';       // eyJhbGciOiJIUzI1NiIs...
+  const SUPABASE_URL  = 'PASTE_YOUR_SUPABASE_URL_HERE';   // e.g. https://abcxyz.supabase.co
+  const SUPABASE_ANON = 'PASTE_YOUR_ANON_KEY_HERE';       // eyJhbGciOiJIUzI1NiIs...
   // =====================================================================
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -451,10 +483,16 @@
 
       if (result.error) throw result.error;
 
-      // Show success
+      // Show success with smooth fade-in
       document.getElementById('form-block').style.display = 'none';
       document.getElementById('success-hub-tag').textContent = 'Hub: ' + selectedHub;
-      document.getElementById('success-block').classList.add('show');
+      var successBlock = document.getElementById('success-block');
+      successBlock.classList.add('show');
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          successBlock.classList.add('visible');
+        });
+      });
 
     } catch (err) {
       console.error('Supabase error:', err);
@@ -472,16 +510,4 @@
 
       setTimeout(function() {
         note.textContent = '// No spam. Early access guaranteed. Unsubscribe anytime.';
-        note.style.color = '';
-        emailInput.classList.remove('error');
-      }, 4000);
-    }
-  }
-
-  document.getElementById('email-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') handleSubmit();
-  });
-</script>
-
-</body>
-</html>
+        note.style
